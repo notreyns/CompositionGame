@@ -11,6 +11,7 @@ import com.neobis.compositiongame.R
 import com.neobis.compositiongame.databinding.FragmentGameBinding
 import com.neobis.compositiongame.databinding.FragmentGameFinishedBinding
 import com.neobis.compositiongame.domain.entities.GameResult
+import com.neobis.compositiongame.domain.entities.GameSettings
 import com.neobis.compositiongame.domain.entities.Level
 import java.lang.RuntimeException
 
@@ -19,6 +20,12 @@ class GameFinished : Fragment() {
     private val binding: FragmentGameFinishedBinding
         get() = _binding ?: throw RuntimeException("FragmentBinding == null")
 
+    private lateinit var gameResult: GameResult
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        parseArgs()
+    }
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -53,13 +60,19 @@ class GameFinished : Fragment() {
             .popBackStack(GameFragment.NAME, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
+    private fun parseArgs(){
+        requireArguments().getParcelable<GameResult>(KEY_RESULTS)?.let {
+            gameResult = it
+        }
+    }
+
     companion object {
         const val KEY_RESULTS = "level"
 
         fun newInstance(result: GameResult): GameFinished {
             return GameFinished().apply {
                 arguments = Bundle().apply {
-                    putSerializable(KEY_RESULTS, result)
+                    putParcelable(KEY_RESULTS, result)
                 }
             }
         }
