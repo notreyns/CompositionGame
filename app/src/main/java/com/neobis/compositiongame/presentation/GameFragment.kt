@@ -19,14 +19,16 @@ import java.lang.RuntimeException
 class GameFragment : Fragment() {
     private lateinit var level: Level
 
-    private var _binding : FragmentGameBinding? = null
-    private val binding : FragmentGameBinding
-    get() = _binding ?: throw RuntimeException("FragmentBinding == null")
+    private var _binding: FragmentGameBinding? = null
+    private val binding: FragmentGameBinding
+        get() = _binding ?: throw RuntimeException("FragmentBinding == null")
 
-    private val viewModel by lazy{
-        ViewModelProvider(this,
-            ViewModelProvider.AndroidViewModelFactory.getInstance(requireActivity().application)
-        )[GameViewModel::class.java]
+    private val viewModelFactory by lazy {
+        GameViewModelFactory(requireActivity().application, level)
+    }
+    private val viewModel by lazy { ViewModelProvider(this,
+        viewModelFactory
+    )[GameViewModel::class.java]
     }
 
     private val tvOptions by lazy {
@@ -57,7 +59,6 @@ class GameFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getQuestion()
-        viewModel.startGame(level)
         showTimer()
         setClickListenersToOptions()
         showPercentage()
@@ -89,6 +90,7 @@ class GameFragment : Fragment() {
             binding.tvAnswersProgress.text = it
         }
     }
+
     private fun getColorByState(goodState: Boolean): Int {
         val colorResId = if (goodState) {
             android.R.color.holo_green_light
@@ -97,6 +99,7 @@ class GameFragment : Fragment() {
         }
         return ContextCompat.getColor(requireContext(), colorResId)
     }
+
     private fun setClickListenersToOptions() {
         for (tvOption in tvOptions) {
             tvOption.setOnClickListener {
@@ -118,7 +121,7 @@ class GameFragment : Fragment() {
             with(binding) {
                 this.tvSum.text = it.sum.toString()
                 this.tvLeftNumber.text = it.visibleNumber.toString()
-                for(i in 0 until it.options.size){
+                for (i in 0 until it.options.size) {
                     tvOptions[i].text = it.options[i].toString();
                 }
             }
@@ -130,24 +133,24 @@ class GameFragment : Fragment() {
         _binding = null
     }
 
-    private fun parseArgs(){
-       requireArguments().getParcelable<Level>(KEY_LEVEL)?.let {
-           level = it
-       }
+    private fun parseArgs() {
+        requireArguments().getParcelable<Level>(KEY_LEVEL)?.let {
+            level = it
+        }
     }
 
-    private fun launchFinishedFragment(result: GameResult){
+    private fun launchFinishedFragment(result: GameResult) {
         requireActivity().supportFragmentManager.beginTransaction()
             .replace(R.id.main_container, GameFinished.newInstance(result))
             .addToBackStack(null)
             .commit()
     }
 
-    companion object{
+    companion object {
         const val KEY_LEVEL = "level"
         const val NAME = "GameFragment"
 
-        fun newInstance(level: Level): GameFragment{
+        fun newInstance(level: Level): GameFragment {
             return GameFragment().apply {
                 arguments = Bundle().apply {
                     putParcelable(KEY_LEVEL, level)
