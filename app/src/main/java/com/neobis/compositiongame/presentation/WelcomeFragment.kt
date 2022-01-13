@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.neobis.compositiongame.R
 import com.neobis.compositiongame.databinding.FragmentGameBinding
 import com.neobis.compositiongame.databinding.FragmentWellcomeBinding
@@ -31,10 +32,7 @@ class WelcomeFragment : Fragment(){
     }
 
     private fun launchChooseLevelFragment() {
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.main_container, FragmentChooseLevel.newInstance())
-            .addToBackStack(null)
-            .commit()
+        findNavController().navigate(R.id.action_welcomeFragment_to_fragmentChooseLevel)
     }
 
     override fun onDestroy() {

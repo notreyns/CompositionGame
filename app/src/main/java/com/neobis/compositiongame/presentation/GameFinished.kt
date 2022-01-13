@@ -8,6 +8,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.navArgs
 import com.neobis.compositiongame.R
 import com.neobis.compositiongame.databinding.FragmentGameBinding
 import com.neobis.compositiongame.databinding.FragmentGameFinishedBinding
@@ -21,7 +22,7 @@ class GameFinished : Fragment() {
     private val binding: FragmentGameFinishedBinding
         get() = _binding ?: throw RuntimeException("FragmentBinding == null")
 
-    private lateinit var gameResult: GameResult
+    private val args by navArgs<GameFinishedArgs>()
     private val viewModel by lazy {
         ViewModelProvider(
             this,
@@ -29,10 +30,6 @@ class GameFinished : Fragment() {
         )[GameViewModel::class.java]
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        parseArgs()
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -60,29 +57,29 @@ class GameFinished : Fragment() {
     }
 
     private fun viewModelObservers() {
-        val imageRes = if (gameResult.winner) {
+        val imageRes = if (args.gameResult.winner) {
             R.drawable.ic_smile
         } else R.drawable.ic_sad
         binding.emojiResult.setImageResource(imageRes)
 
         binding.tvRequiredAnswers.text = String.format(
             getString(R.string.required_score),
-            gameResult.gameSettings.minCountOfRightAnswers
+            args.gameResult.gameSettings.minCountOfRightAnswers
         )
         binding.tvScoreAnswers.text = String.format(
             getString(R.string.score_answers),
-            gameResult.countOfRightAnswers)
+            args.gameResult.countOfRightAnswers)
 
         binding.tvRequiredPercentage.text = String.format(
             getString(R.string.required_percentage),
-            gameResult.gameSettings.minPercentOfRightAnswers
+            args.gameResult.gameSettings.minPercentOfRightAnswers
         )
         binding.tvScorePercentage.text = String.format(
             getString(R.string.score_percentage),
             getPercentOfRightAnswers())
     }
 
-    private fun getPercentOfRightAnswers()= with(gameResult){
+    private fun getPercentOfRightAnswers()= with(args.gameResult){
         if(countOfRightAnswers==0) 0
         else ((countOfRightAnswers / countOfQuestions.toDouble()) *100).toInt()
     }
@@ -97,21 +94,4 @@ class GameFinished : Fragment() {
             .popBackStack(GameFragment.NAME, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
-    private fun parseArgs() {
-        requireArguments().getParcelable<GameResult>(KEY_RESULTS)?.let {
-            gameResult = it
-        }
-    }
-
-    companion object {
-        const val KEY_RESULTS = "level"
-
-        fun newInstance(result: GameResult): GameFinished {
-            return GameFinished().apply {
-                arguments = Bundle().apply {
-                    putParcelable(KEY_RESULTS, result)
-                }
-            }
-        }
-    }
 }

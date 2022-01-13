@@ -10,25 +10,28 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import com.neobis.compositiongame.R
+import androidx.navigation.fragment.findNavController
+import androidx.navigation.fragment.navArgs
 import com.neobis.compositiongame.databinding.FragmentGameBinding
 import com.neobis.compositiongame.domain.entities.GameResult
-import com.neobis.compositiongame.domain.entities.Level
 import java.lang.RuntimeException
 
 class GameFragment : Fragment() {
-    private lateinit var level: Level
 
     private var _binding: FragmentGameBinding? = null
     private val binding: FragmentGameBinding
         get() = _binding ?: throw RuntimeException("FragmentBinding == null")
 
+    private val args by navArgs<GameFragmentArgs>()
     private val viewModelFactory by lazy {
-        GameViewModelFactory(requireActivity().application, level)
+        //val args = GameFragmentArgs.fromBundle(requireArguments())
+        GameViewModelFactory(requireActivity().application, args.level)
     }
-    private val viewModel by lazy { ViewModelProvider(this,
-        viewModelFactory
-    )[GameViewModel::class.java]
+    private val viewModel by lazy {
+        ViewModelProvider(
+            this,
+            viewModelFactory
+        )[GameViewModel::class.java]
     }
 
     private val tvOptions by lazy {
@@ -51,11 +54,6 @@ class GameFragment : Fragment() {
         return binding.root
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        parseArgs()
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         getQuestion()
@@ -64,7 +62,6 @@ class GameFragment : Fragment() {
         showPercentage()
 
     }
-
 
     private fun showPercentage() {
         viewModel.percentOfRightAnswers.observe(viewLifecycleOwner) {
@@ -113,7 +110,6 @@ class GameFragment : Fragment() {
         viewModel.formattedTime.observe(viewLifecycleOwner) {
             binding.tvTimer.text = it
         }
-
     }
 
     private fun getQuestion() {
@@ -133,29 +129,7 @@ class GameFragment : Fragment() {
         _binding = null
     }
 
-    private fun parseArgs() {
-        requireArguments().getParcelable<Level>(KEY_LEVEL)?.let {
-            level = it
-        }
-    }
-
     private fun launchFinishedFragment(result: GameResult) {
-        requireActivity().supportFragmentManager.beginTransaction()
-            .replace(R.id.main_container, GameFinished.newInstance(result))
-            .addToBackStack(null)
-            .commit()
-    }
-
-    companion object {
-        const val KEY_LEVEL = "level"
-        const val NAME = "GameFragment"
-
-        fun newInstance(level: Level): GameFragment {
-            return GameFragment().apply {
-                arguments = Bundle().apply {
-                    putParcelable(KEY_LEVEL, level)
-                }
-            }
-        }
+        findNavController().navigate(GameFragmentDirections.actionGameFragmentToGameFinished(result))
     }
 }

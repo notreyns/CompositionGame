@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+             xmlns:app="http://schemas.android.com/apk/res-auto"
+             android:id="@+id/main_nav"
+    app:startDestination="@id/welcomeFragment">
+
+    <fragment
+        android:id="@+id/welcomeFragment"
+        android:name="com.neobis.compositiongame.presentation.WelcomeFragment"
+        android:label="WelcomeFragment" >
+        <action
+            android:id="@+id/action_welcomeFragment_to_fragmentChooseLevel"
+            app:destination="@id/fragmentChooseLevel" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragmentChooseLevel"
+        android:name="com.neobis.compositiongame.presentation.FragmentChooseLevel"
+        android:label="FragmentChooseLevel" >
+        <action
+            android:id="@+id/action_fragmentChooseLevel_to_gameFragment"
+            app:destination="@id/gameFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameFragment"
+        android:name="com.neobis.compositiongame.presentation.GameFragment"
+        android:label="GameFragment" >
+        <action
+            android:id="@+id/action_gameFragment_to_gameFinished"
+            app:destination="@id/gameFinished"
+            app:popUpTo="@id/gameFragment"
+            app:popUpToInclusive="true" />
+        <argument
+            android:name="level"
+            app:argType="com.neobis.compositiongame.domain.entities.Level" />
+    </fragment>
+    <fragment
+        android:id="@+id/gameFinished"
+        android:name="com.neobis.compositiongame.presentation.GameFinished"
+        android:label="GameFinished" >
+        <argument
+            android:name="gameResult"
+            app:argType="com.neobis.compositiongame.domain.entities.GameResult" />
+    </fragment>
+</navigation>
