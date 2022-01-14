@@ -8,9 +8,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.neobis.compositiongame.R
 import com.neobis.compositiongame.databinding.FragmentChooseLevelBinding
-import com.neobis.compositiongame.databinding.FragmentGameBinding
 import com.neobis.compositiongame.domain.entities.Level
-import com.neobis.compositiongame.presentation.GameFragment.Companion.KEY_LEVEL
 import java.lang.RuntimeException
 
 class FragmentChooseLevel : Fragment() {
